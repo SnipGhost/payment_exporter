@@ -1,0 +1,674 @@
+{
+	"annotations": {
+		"list": [
+			{
+				"builtIn": 1,
+				"datasource": "-- Grafana --",
+				"enable": true,
+				"hide": true,
+				"iconColor": "rgba(0, 211, 255, 1)",
+				"name": "Annotations & Alerts",
+				"type": "dashboard"
+			}
+		]
+	},
+	"editable": true,
+	"gnetId": null,
+	"graphTooltip": 0,
+	"id": 13,
+	"links": [],
+	"panels": [
+		{
+			"datasource": null,
+			"fieldConfig": {
+				"defaults": {
+					"custom": {},
+					"mappings": [],
+					"thresholds": {
+						"mode": "absolute",
+						"steps": [
+							{
+								"color": "red",
+								"value": null
+							},
+							{
+								"color": "yellow",
+								"value": 31
+							},
+							{
+								"color": "green",
+								"value": 62
+							}
+						]
+					},
+					"unit": "d"
+				},
+				"overrides": []
+			},
+			"gridPos": {
+				"h": 4,
+				"w": 6,
+				"x": 0,
+				"y": 0
+			},
+			"id": 4,
+			"options": {
+				"colorMode": "value",
+				"graphMode": "none",
+				"justifyMode": "auto",
+				"orientation": "auto",
+				"reduceOptions": {
+					"calcs": [
+						"last"
+					],
+					"fields": "",
+					"values": false
+				},
+				"textMode": "auto"
+			},
+			"pluginVersion": "7.3.6",
+			"targets": [
+				{
+					"expr": "maryno_net_days_since_block",
+					"interval": "",
+					"legendFormat": "",
+					"refId": "A"
+				}
+			],
+			"timeFrom": null,
+			"timeShift": null,
+			"title": "Времени без блокировки счета",
+			"type": "stat"
+		},
+		{
+			"datasource": null,
+			"fieldConfig": {
+				"defaults": {
+					"custom": {},
+					"mappings": [
+						{
+							"from": "",
+							"id": 1,
+							"text": "Активен",
+							"to": "",
+							"type": 1,
+							"value": "0"
+						},
+						{
+							"from": "",
+							"id": 2,
+							"text": "Заблокирован",
+							"to": "",
+							"type": 1,
+							"value": "1"
+						}
+					],
+					"thresholds": {
+						"mode": "absolute",
+						"steps": [
+							{
+								"color": "green",
+								"value": null
+							},
+							{
+								"color": "red",
+								"value": 1
+							}
+						]
+					},
+					"unit": "none"
+				},
+				"overrides": []
+			},
+			"gridPos": {
+				"h": 4,
+				"w": 4,
+				"x": 6,
+				"y": 0
+			},
+			"id": 8,
+			"options": {
+				"colorMode": "value",
+				"graphMode": "none",
+				"justifyMode": "auto",
+				"orientation": "auto",
+				"reduceOptions": {
+					"calcs": [
+						"last"
+					],
+					"fields": "",
+					"values": false
+				},
+				"textMode": "auto"
+			},
+			"pluginVersion": "7.3.6",
+			"targets": [
+				{
+					"expr": "maryno_net_is_blocked",
+					"interval": "",
+					"legendFormat": "",
+					"refId": "A"
+				}
+			],
+			"timeFrom": null,
+			"timeShift": null,
+			"title": "Состояние счета",
+			"type": "stat"
+		},
+		{
+			"datasource": null,
+			"fieldConfig": {
+				"defaults": {
+					"color": {
+						"fixedColor": "purple",
+						"mode": "fixed"
+					},
+					"custom": {},
+					"mappings": [],
+					"thresholds": {
+						"mode": "absolute",
+						"steps": [
+							{
+								"color": "green",
+								"value": null
+							},
+							{
+								"color": "red",
+								"value": 80
+							}
+						]
+					},
+					"unit": "dateTimeFromNow"
+				},
+				"overrides": []
+			},
+			"gridPos": {
+				"h": 4,
+				"w": 4,
+				"x": 10,
+				"y": 0
+			},
+			"id": 12,
+			"options": {
+				"colorMode": "value",
+				"graphMode": "none",
+				"justifyMode": "auto",
+				"orientation": "auto",
+				"reduceOptions": {
+					"calcs": [
+						"last"
+					],
+					"fields": "",
+					"values": false
+				},
+				"textMode": "auto"
+			},
+			"pluginVersion": "7.3.6",
+			"targets": [
+				{
+					"expr": "maryno_net_last_pay_seconds * 1000",
+					"instant": false,
+					"interval": "",
+					"legendFormat": "",
+					"refId": "A"
+				}
+			],
+			"timeFrom": null,
+			"timeShift": null,
+			"title": "Последняя оплата",
+			"type": "stat"
+		},
+		{
+			"datasource": null,
+			"fieldConfig": {
+				"defaults": {
+					"color": {
+						"fixedColor": "orange",
+						"mode": "fixed"
+					},
+					"custom": {},
+					"mappings": [],
+					"thresholds": {
+						"mode": "absolute",
+						"steps": [
+							{
+								"color": "green",
+								"value": null
+							}
+						]
+					},
+					"unit": "currencyRUB"
+				},
+				"overrides": []
+			},
+			"gridPos": {
+				"h": 4,
+				"w": 5,
+				"x": 14,
+				"y": 0
+			},
+			"id": 10,
+			"options": {
+				"colorMode": "value",
+				"graphMode": "none",
+				"justifyMode": "auto",
+				"orientation": "auto",
+				"reduceOptions": {
+					"calcs": [
+						"last"
+					],
+					"fields": "",
+					"values": false
+				},
+				"textMode": "auto"
+			},
+			"pluginVersion": "7.3.6",
+			"targets": [
+				{
+					"expr": "maryno_net_last_pay_sum",
+					"interval": "",
+					"legendFormat": "",
+					"refId": "A"
+				}
+			],
+			"timeFrom": null,
+			"timeShift": null,
+			"title": "Сумма последней оплаты",
+			"type": "stat"
+		},
+		{
+			"datasource": null,
+			"fieldConfig": {
+				"defaults": {
+					"color": {
+						"fixedColor": "blue",
+						"mode": "fixed"
+					},
+					"custom": {},
+					"mappings": [],
+					"thresholds": {
+						"mode": "absolute",
+						"steps": [
+							{
+								"color": "blue",
+								"value": null
+							}
+						]
+					},
+					"unit": "currencyRUB"
+				},
+				"overrides": []
+			},
+			"gridPos": {
+				"h": 4,
+				"w": 5,
+				"x": 19,
+				"y": 0
+			},
+			"id": 6,
+			"options": {
+				"colorMode": "value",
+				"graphMode": "none",
+				"justifyMode": "auto",
+				"orientation": "auto",
+				"reduceOptions": {
+					"calcs": [
+						"last"
+					],
+					"fields": "",
+					"values": false
+				},
+				"textMode": "auto"
+			},
+			"pluginVersion": "7.3.6",
+			"targets": [
+				{
+					"expr": "maryno_net_sum_pays",
+					"interval": "",
+					"legendFormat": "",
+					"refId": "A"
+				}
+			],
+			"timeFrom": null,
+			"timeShift": null,
+			"title": "Потрачено на интернет",
+			"type": "stat"
+		},
+		{
+			"aliasColors": {},
+			"bars": false,
+			"dashLength": 10,
+			"dashes": false,
+			"datasource": null,
+			"fieldConfig": {
+				"defaults": {
+					"custom": {},
+					"unit": "currencyRUB"
+				},
+				"overrides": []
+			},
+			"fill": 1,
+			"fillGradient": 0,
+			"gridPos": {
+				"h": 7,
+				"w": 24,
+				"x": 0,
+				"y": 4
+			},
+			"hiddenSeries": false,
+			"id": 2,
+			"legend": {
+				"avg": false,
+				"current": false,
+				"max": false,
+				"min": false,
+				"show": true,
+				"total": false,
+				"values": false
+			},
+			"lines": true,
+			"linewidth": 1,
+			"nullPointMode": "null",
+			"options": {
+				"alertThreshold": true
+			},
+			"percentage": false,
+			"pluginVersion": "7.3.6",
+			"pointradius": 2,
+			"points": false,
+			"renderer": "flot",
+			"seriesOverrides": [],
+			"spaceLength": 10,
+			"stack": false,
+			"steppedLine": false,
+			"targets": [
+				{
+					"expr": "maryno_net_balance",
+					"interval": "",
+					"legendFormat": "Баланс счета",
+					"refId": "A"
+				},
+				{
+					"expr": "maryno_net_plan_cost",
+					"interval": "",
+					"legendFormat": "Стоимость в месяц",
+					"refId": "B"
+				}
+			],
+			"thresholds": [],
+			"timeFrom": null,
+			"timeRegions": [],
+			"timeShift": null,
+			"title": "Баланс счета Maryno.net",
+			"tooltip": {
+				"shared": true,
+				"sort": 0,
+				"value_type": "individual"
+			},
+			"type": "graph",
+			"xaxis": {
+				"buckets": null,
+				"mode": "time",
+				"name": null,
+				"show": true,
+				"values": []
+			},
+			"yaxes": [
+				{
+					"format": "currencyRUB",
+					"label": null,
+					"logBase": 1,
+					"max": null,
+					"min": null,
+					"show": true
+				},
+				{
+					"format": "short",
+					"label": null,
+					"logBase": 1,
+					"max": null,
+					"min": null,
+					"show": true
+				}
+			],
+			"yaxis": {
+				"align": false,
+				"alignLevel": null
+			}
+		},
+		{
+			"aliasColors": {},
+			"bars": false,
+			"dashLength": 10,
+			"dashes": false,
+			"datasource": null,
+			"fieldConfig": {
+				"defaults": {
+					"custom": {}
+				},
+				"overrides": []
+			},
+			"fill": 1,
+			"fillGradient": 0,
+			"gridPos": {
+				"h": 6,
+				"w": 12,
+				"x": 0,
+				"y": 11
+			},
+			"hiddenSeries": false,
+			"id": 14,
+			"legend": {
+				"avg": false,
+				"current": false,
+				"max": false,
+				"min": false,
+				"show": true,
+				"total": false,
+				"values": false
+			},
+			"lines": true,
+			"linewidth": 1,
+			"nullPointMode": "null",
+			"options": {
+				"alertThreshold": true
+			},
+			"percentage": false,
+			"pluginVersion": "7.3.6",
+			"pointradius": 2,
+			"points": false,
+			"renderer": "flot",
+			"seriesOverrides": [],
+			"spaceLength": 10,
+			"stack": false,
+			"steppedLine": false,
+			"targets": [
+				{
+					"expr": "maryno_net_bonus_count",
+					"interval": "",
+					"legendFormat": "Общее количество бонусов",
+					"refId": "A"
+				},
+				{
+					"expr": "maryno_net_bonus_available",
+					"interval": "",
+					"legendFormat": "Доступные бонусы",
+					"refId": "B"
+				}
+			],
+			"thresholds": [],
+			"timeFrom": null,
+			"timeRegions": [],
+			"timeShift": null,
+			"title": "G-Bonus",
+			"tooltip": {
+				"shared": true,
+				"sort": 0,
+				"value_type": "individual"
+			},
+			"type": "graph",
+			"xaxis": {
+				"buckets": null,
+				"mode": "time",
+				"name": null,
+				"show": true,
+				"values": []
+			},
+			"yaxes": [
+				{
+					"decimals": 0,
+					"format": "short",
+					"label": null,
+					"logBase": 1,
+					"max": null,
+					"min": "0",
+					"show": true
+				},
+				{
+					"format": "short",
+					"label": null,
+					"logBase": 1,
+					"max": null,
+					"min": null,
+					"show": false
+				}
+			],
+			"yaxis": {
+				"align": false,
+				"alignLevel": null
+			}
+		},
+		{
+			"aliasColors": {},
+			"bars": false,
+			"dashLength": 10,
+			"dashes": false,
+			"datasource": null,
+			"description": "",
+			"fieldConfig": {
+				"defaults": {
+					"custom": {},
+					"mappings": [],
+					"thresholds": {
+						"mode": "absolute",
+						"steps": [
+							{
+								"color": "green",
+								"value": null
+							},
+							{
+								"color": "red",
+								"value": 80
+							}
+						]
+					},
+					"unit": "currencyRUB"
+				},
+				"overrides": []
+			},
+			"fill": 1,
+			"fillGradient": 0,
+			"gridPos": {
+				"h": 6,
+				"w": 12,
+				"x": 12,
+				"y": 11
+			},
+			"hiddenSeries": false,
+			"id": 16,
+			"legend": {
+				"avg": false,
+				"current": false,
+				"max": false,
+				"min": false,
+				"show": true,
+				"total": false,
+				"values": false
+			},
+			"lines": true,
+			"linewidth": 1,
+			"nullPointMode": "null",
+			"options": {
+				"alertThreshold": true
+			},
+			"percentage": false,
+			"pluginVersion": "7.3.6",
+			"pointradius": 2,
+			"points": false,
+			"renderer": "flot",
+			"seriesOverrides": [],
+			"spaceLength": 10,
+			"stack": true,
+			"steppedLine": false,
+			"targets": [
+				{
+					"expr": "maryno_net_sum_pays",
+					"interval": "",
+					"legendFormat": "Всего оплачено",
+					"refId": "A"
+				},
+				{
+					"expr": "maryno_net_sum_pays_remaining",
+					"interval": "",
+					"legendFormat": "Осталось до уровня",
+					"refId": "B"
+				}
+			],
+			"thresholds": [],
+			"timeFrom": null,
+			"timeRegions": [],
+			"timeShift": null,
+			"title": "До нового уровня G-Bonus",
+			"tooltip": {
+				"shared": true,
+				"sort": 0,
+				"value_type": "individual"
+			},
+			"type": "graph",
+			"xaxis": {
+				"buckets": null,
+				"mode": "time",
+				"name": null,
+				"show": true,
+				"values": []
+			},
+			"yaxes": [
+				{
+					"format": "currencyRUB",
+					"label": null,
+					"logBase": 1,
+					"max": null,
+					"min": "0",
+					"show": true
+				},
+				{
+					"format": "short",
+					"label": null,
+					"logBase": 1,
+					"max": null,
+					"min": null,
+					"show": true
+				}
+			],
+			"yaxis": {
+				"align": false,
+				"alignLevel": null
+			}
+		}
+	],
+	"schemaVersion": 26,
+	"style": "dark",
+	"tags": [],
+	"templating": {
+		"list": []
+	},
+	"time": {
+		"from": "now-30m",
+		"to": "now"
+	},
+	"timepicker": {},
+	"timezone": "",
+	"title": "Payments",
+	"uid": "Ii7ZkWmRz",
+	"version": 5
+}
