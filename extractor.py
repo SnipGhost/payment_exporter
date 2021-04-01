@@ -50,7 +50,7 @@ class MarynoNetExtractor:
             return None
         return data
 
-    def _make_subrequest(self, entity, url):
+    def _make_chain_request(self, entity, url):
         data = self._parse_response(self._make_request('get', url))
         if not data:
             self.log.warning('Empty list for {} in {}'.format(entity, data))
@@ -85,7 +85,7 @@ class MarynoNetExtractor:
             ('product_id', self.product_url),
         )
         for entity, url in chain:
-            if not self._make_subrequest(entity, url):
+            if not self._make_chain_request(entity, url):
                 self.log.warning('Failed to get {} {}'.format(entity, url))
                 return False
         self.log.info('Authentication complete')

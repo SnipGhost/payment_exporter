@@ -34,6 +34,7 @@ class PaymentExporter:
         self.running = True
         self.end_event = threading.Event()
         self.__setup_signal_handlers()
+        self.append_metrics(self.conf['metrics'])
 
     def _load_config(self, args):
         log_format = [
@@ -119,7 +120,6 @@ class PaymentExporter:
         return True
 
     def run(self):
-        self.append_metrics(self.conf['metrics'])
         try:
             if not self.fill_metrics(self.conf['metrics']):
                 raise Exception('Failed to init metrics')
