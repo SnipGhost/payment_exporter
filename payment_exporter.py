@@ -6,8 +6,8 @@ import sys
 import signal
 import threading
 from prometheus_client import start_http_server, Gauge
-from extractor import Extractor
-from utils import *
+from extractor import MarynoNetExtractor
+from utils import hide_config
 
 
 class PaymentExporter:
@@ -23,11 +23,12 @@ class PaymentExporter:
             self.log.error('Not found user or pass in config')
             exit(0)
 
-        self.extractor = Extractor(
+        self.extractor = MarynoNetExtractor(
             self.log,
             self.conf['user'],
             self.conf['pass'],
-            self.conf['base_url']
+            self.conf['base_url'],
+            self.conf['auth_retry'],
         )
         self.exporter_metrics = {}
         self.running = True
@@ -106,17 +107,10 @@ class PaymentExporter:
         return self.exporter_metrics
 
     def fill_metrics(self, metrics):
-        is_auth = False
-        attempt = 0
-        retry_limit = self.conf['auth_retry']
-        while not is_auth and attempt < retry_limit:
-            is_auth = self.extractor.auth()
-            attempt += 1
-        if not is_auth:
-            self.log.error('Failed to auth, auth retry limit')
-            return False
-
         info = self.extractor.run()
+        if not info:
+            self.log.warning('Wrong data from extractor')
+            return False
         for title, metric in metrics.items():
             info_type = metric.get('type', 'data')
             info_key = metric.get('key', title)

@@ -2,15 +2,16 @@ import requests
 import dateutil.parser as dp
 
 
-class Extractor:
+class MarynoNetExtractor:
 
-    def __init__(self, logger, username, password, base_url):
+    def __init__(self, logger, username, password, base_url, auth_retry):
         self.log = logger
         self.session = requests.Session()
 
         self.username = username
         self.password = password
 
+        self.auth_retry = auth_retry
         self.xsrf_url = base_url + '/favicon.ico'
         self.auth_url = base_url + '/auth'
         self.contract_url = base_url + '/api/user/contract'
@@ -24,7 +25,7 @@ class Extractor:
             'Connection': 'keep-alive',
         }
 
-    def make_request(self, method, url, headers=None, **kwargs):
+    def _make_request(self, method, url, headers=None, **kwargs):
         s = self.session
         if headers is None:
             headers = self.default_headers
@@ -38,7 +39,7 @@ class Extractor:
             self.log.error('4xx or 5xx response: {}'.format(response.text))
         return response
 
-    def parse_response(self, response):
+    def _parse_response(self, response):
         if not response:
             self.log.debug('Wrong response: {}'.format(response))
             return None
@@ -49,8 +50,8 @@ class Extractor:
             return None
         return data
 
-    def make_subrequest(self, entity, url):
-        data = self.parse_response(self.make_request('get', url))
+    def _make_subrequest(self, entity, url):
+        data = self._parse_response(self._make_request('get', url))
         if not data:
             self.log.warning('Empty list for {} in {}'.format(entity, data))
             return None
@@ -61,18 +62,18 @@ class Extractor:
             self.log.warning('No entity {} in: {}'.format(entity, data))
             return None
 
-        response = self.make_request('post', url + '/{}'.format(entity_data))
+        response = self._make_request('post', url + '/{}'.format(entity_data))
         self.log.debug('Entity subrequest response: {}'.format(response.text))
         return response
 
-    def auth(self):
+    def _auth(self):
         self.log.info('Make authentication requests')
-        if not self.make_request('get', self.xsrf_url):
+        if not self._make_request('get', self.xsrf_url):
             self.log.warning('Failed to get first xsrf token')
             return False
 
         creds = {"username": self.username, "password": self.password}
-        auth_response = self.make_request('post', self.auth_url, json=creds)
+        auth_response = self._make_request('post', self.auth_url, json=creds)
         self.log.debug('Auth response: {}'.format(auth_response.text))
         if not auth_response:
             self.log.warning('Failed to auth {}'.format(auth_response))
@@ -84,17 +85,17 @@ class Extractor:
             ('product_id', self.product_url),
         )
         for entity, url in chain:
-            if not self.make_subrequest(entity, url):
+            if not self._make_subrequest(entity, url):
                 self.log.warning('Failed to get {} {}'.format(entity, url))
                 return False
         self.log.info('Authentication complete')
         return True
 
-    def run(self):
+    def _extract(self):
         self.log.info('Extract data from: {}'.format(self.data_url))
-        data = self.parse_response(self.make_request('get', self.data_url))
+        data = self._parse_response(self._make_request('get', self.data_url))
         self.log.info('Extract data from: {}'.format(self.bonus_url))
-        bonus = self.parse_response(self.make_request('get', self.bonus_url))
+        bonus = self._parse_response(self._make_request('get', self.bonus_url))
         if data is not None:
             data['plan_speed'] = int(data.get('plan_speed', 0))
             data['status'] = int(data.get('status', None) == 'Активен')
@@ -110,3 +111,12 @@ class Extractor:
             bonus = {}
         self.log.info('All data retrieved and corrected')
         return {'data': data, 'bonus': bonus}
+
+    def run(self):
+        attempt = 0
+        while not self._auth():
+            attempt += 1
+            if attempt >= self.auth_retry:
+                self.log.error('Failed to auth, auth retry limit')
+                return None
+        return self._extract()
