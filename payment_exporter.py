@@ -6,8 +6,8 @@ import sys
 import signal
 import threading
 from prometheus_client import start_http_server, Gauge
-from extractor import MarynoNetExtractor
 from utils import hide_config
+import modules
 
 
 class PaymentExporter:
@@ -19,56 +19,59 @@ class PaymentExporter:
         self.log.setLevel(getattr(logging, self.conf['log_level']))
         self.log.info('Loaded config')
         self.log.debug('Config: {}'.format(hide_config(self.conf)))
-        if not self.conf['user'] or not self.conf['pass']:
-            self.log.error('Not found user or pass in config')
-            exit(0)
 
-        self.extractor = MarynoNetExtractor(
-            self.log,
-            self.conf['user'],
-            self.conf['pass'],
-            self.conf['base_url'],
-            self.conf['auth_retry'],
-        )
+        # Construct used extractors
+        self.extractors = {}
+        for prefix, extractor in self.conf['extractors'].items():
+            class_name = extractor.get('module', 'Extractor')
+            extractor_class = getattr(modules, class_name)
+            self.extractors[prefix] = extractor_class(self.log, **extractor)
+        # Create used metrics
         self.exporter_metrics = {}
+        for prefix, definition in self.conf['metrics'].items():
+            self.append_metrics(prefix, definition)
+
         self.running = True
         self.end_event = threading.Event()
         self.__setup_signal_handlers()
-        self.append_metrics(self.conf['metrics'])
 
     def _load_config(self, args):
+        # Default log format (not joined yet)
         log_format = [
             "[%(levelname)s]",
             "%(module)s:%(funcName)s:%(lineno)d",
             "%(message)s",
         ]
-        base_url = 'https://lk.maryno.net'
         # Default config
         config = {
             'log_level': 'INFO',     # logging level
             'log_format': None,      # logging format (None for default)
             'sleep': 43200,          # time to sleep in seconds before collect
-            'user': None,            # maryno.net account number (required)
-            'pass': None,            # maryno.net account password (required)
-            'base_url': base_url,    # base url to maryno.net account site
-            'auth_retry': 2,         # attempts to authenticate
             'port': 9999,            # port binding to expose metrics
-            'prefix': 'maryno_net',  # metrics prefix like node_exporter_*
-            'metrics': {             # definition of metrics
-                "balance": {
-                    "desc": "Maryno.net provider balance in rub"
-                },
-                "plan_cost": {
-                    "desc": "Maryno.net provider plan price in rub"
-                },
-                "status": {
-                    "desc": "Maryno.net provider account status"
-                },
-                "is_blocked": {
-                    "desc": "Maryno.net provider account state"
-                },
-                "is_voluntary_blocked": {
-                    "desc": "Maryno.net provider account blocked by user state"
+            'extractors': {          # definition of prefixes and extractors
+                'maryno_net': {
+                    'module': 'MarynoNetExtractor',
+                    'username': '',  # maryno.net account (required)
+                    'password': '',  # maryno.net password (required)
+                }
+            },
+            'metrics': {             # definition of used prefixes and metrics
+                'maryno_net': {      # metrics prefix like node_exporter_*
+                    "balance": {
+                        "desc": "Maryno.net provider balance in rub"
+                    },
+                    "plan_cost": {
+                        "desc": "Maryno.net provider plan price in rub"
+                    },
+                    "status": {
+                        "desc": "Maryno.net provider account status"
+                    },
+                    "is_blocked": {
+                        "desc": "Maryno.net provider account state"
+                    },
+                    "is_voluntary_blocked": {
+                        "desc": "Maryno.net provider account blocked by user state"
+                    },
                 },
             },
         }
@@ -100,23 +103,27 @@ class PaymentExporter:
         signal.signal(signal.SIGTERM, self.__signal_stop_handler)
         signal.signal(signal.SIGINT, self.__signal_stop_handler)
 
-    def append_metrics(self, metrics):
+    def append_metrics(self, prefix, metrics):
         for metric in metrics:
-            name = self.conf['prefix'] + '_' + metric
+            name = prefix + '_' + metric
             desc = metrics[metric].get('desc', metric)
             self.exporter_metrics[metric] = Gauge(name, desc)
         return self.exporter_metrics
 
-    def fill_metrics(self, metrics):
-        info = self.extractor.run()
-        if not info:
-            self.log.warning('Wrong data from extractor')
-            return False
-        for title, metric in metrics.items():
-            info_type = metric.get('type', 'data')
-            info_key = metric.get('key', title)
-            value = info[info_type].get(info_key, None)
-            self.exporter_metrics[title].set(value)
+    def fill_metrics(self, all_metrics):
+        for prefix, metrics in all_metrics.items():
+            extractor = self.extractors[prefix]
+            info = extractor.run()
+            if not info:
+                self.log.warning('Wrong data from {}'.format(extractor))
+                return False
+            for title, metric in metrics.items():
+                info_type = metric.get('type', 'data')
+                info_key = metric.get('key', title)
+                info_dict = info.get(info_type, None)
+                if info_dict:
+                    value = info_dict.get(info_key, 0)
+                    self.exporter_metrics[title].set(value)
         return True
 
     def run(self):
@@ -146,16 +153,10 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Payment exporter')
     parser.add_argument('-c', '--config', type=str, default='payment_exporter.config.json',
                         help='Path to config JSON file')
-    parser.add_argument('-p', '--prefix', type=str, default=None,
-                        help='Prefix for exporter metrics')
-    parser.add_argument('-u', '--base-url', type=str, default=None,
-                        help='Base url for Maryno.net personal site')
     parser.add_argument('-s', '--sleep', type=str, default=None,
                         help='Sleep time in seconds, a low value may cause rate-limit')
     parser.add_argument('-P', '--port', type=int, default=None,
                         help='Exporter port')
-    parser.add_argument('-r', '--auth-retry', type=int, default=None,
-                        help='Auth retry attempts limit')
     parser.add_argument('-l', '--log-level', type=str, default=None,
                         help='Logging level from {debug, info, warning, error}')
     exporter = PaymentExporter(parser.parse_args())

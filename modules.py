@@ -2,11 +2,24 @@ import requests
 import dateutil.parser as dp
 
 
-class MarynoNetExtractor:
+class Extractor:
+    ''' Default extractor, do nothing '''
 
-    def __init__(self, logger, username, password, base_url, auth_retry):
+    def __init__(self, logger, **kwargs):
         self.log = logger
+
+    def run(self):
+        return {'data': {}}
+
+
+class MarynoNetExtractor(Extractor):
+    ''' Extract metrics data from maryno.net account pages '''
+
+    def __init__(self, logger, username, password, **kwargs):
+        super(MarynoNetExtractor, self).__init__(logger, **kwargs)
         self.session = requests.Session()
+        base_url = kwargs.get('base_url', 'https://lk.maryno.net')
+        auth_retry = kwargs.get('auth_retry', 2)
 
         self.username = username
         self.password = password

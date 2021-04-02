@@ -1,59 +1,67 @@
 {
-	"user": "",
-	"pass": "",
 	"log_level": "info",
 	"sleep": 43200,
 	"port": 9999,
-	"prefix": "maryno_net",
+	"extractors": {
+		"maryno_net": {
+			"module": "MarynoNetExtractor",
+			"username": "",
+			"password": "",
+			"auth_retry": 2,
+			"base_url": "https://lk.maryno.net"
+		}
+	},
 	"metrics": {
-		"balance": {
-			"desc": "Maryno.net provider balance in rub"
-		},
-		"plan_cost": {
-			"desc": "Maryno.net provider plan price in rub"
-		},
-		"plan_speed": {
-			"desc": "Maryno.net provider plan speed in mbits"
-		},
-		"status": {
-			"desc": "Maryno.net provider account status"
-		},
-		"is_blocked": {
-			"desc": "Maryno.net provider account state"
-		},
-		"is_voluntary_blocked": {
-			"desc": "Maryno.net provider account blocked by user state"
-		},
-		"sum_pays": {
-			"desc": "Maryno.net provider summary pays in rub",
-			"type": "bonus"
-		},
-		"sum_pays_remaining": {
-			"desc": "Maryno.net provider remaining pays for reach new level",
-			"type": "bonus"
-		},
-		"last_pay_sum": {
-			"desc": "Maryno.net provider last payment in rub",
-			"type": "bonus"
-		},
-		"last_pay_seconds": {
-			"desc": "Maryno.net provider seconds since last payment",
-			"type": "bonus",
-			"key": "last_pay_dt"
-		},
-		"bonus_count": {
-			"desc": "Maryno.net provider g-bonus balance",
-			"type": "bonus",
-			"key": "n_bonus"
-		},
-		"bonus_available": {
-			"desc": "Maryno.net provider g-bonus available",
-			"type": "bonus",
-			"key": "n_avail"
-		},
-		"days_since_block": {
-			"desc": "Maryno.net provider days since last blocking",
-			"type": "bonus"
+		"maryno_net": {
+			"balance": {
+				"desc": "Maryno.net provider balance in rub"
+			},
+			"plan_cost": {
+				"desc": "Maryno.net provider plan price in rub"
+			},
+			"plan_speed": {
+				"desc": "Maryno.net provider plan speed in mbits"
+			},
+			"status": {
+				"desc": "Maryno.net provider account status"
+			},
+			"is_blocked": {
+				"desc": "Maryno.net provider account state"
+			},
+			"is_voluntary_blocked": {
+				"desc": "Maryno.net provider account blocked by user state"
+			},
+			"sum_pays": {
+				"desc": "Maryno.net provider summary pays in rub",
+				"type": "bonus"
+			},
+			"sum_pays_remaining": {
+				"desc": "Maryno.net provider remaining pays for reach new level",
+				"type": "bonus"
+			},
+			"last_pay_sum": {
+				"desc": "Maryno.net provider last payment in rub",
+				"type": "bonus"
+			},
+			"last_pay_seconds": {
+				"desc": "Maryno.net provider seconds since last payment",
+				"type": "bonus",
+				"key": "last_pay_dt"
+			},
+			"bonus_count": {
+				"desc": "Maryno.net provider g-bonus balance",
+				"type": "bonus",
+				"key": "n_bonus"
+			},
+			"bonus_available": {
+				"desc": "Maryno.net provider g-bonus available",
+				"type": "bonus",
+				"key": "n_avail"
+			},
+			"days_since_block": {
+				"desc": "Maryno.net provider days since last blocking",
+				"type": "bonus"
+			}
 		}
 	}
 }
