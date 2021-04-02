@@ -18,7 +18,8 @@ class PaymentExporter:
         self.log = logging.getLogger()
         self.log.setLevel(getattr(logging, self.conf['log_level']))
         self.log.info('Loaded config')
-        self.log.debug('Config: {}'.format(hide_config(self.conf)))
+        if self.conf['log_level'] == 'DEBUG':
+            self.log.debug('Config: {}'.format(hide_config(self.conf)))
 
         # Construct used extractors
         self.extractors = {}
