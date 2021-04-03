@@ -115,7 +115,7 @@ class PaymentExporter:
         for metric in metrics:
             name = prefix + '_' + metric
             desc = metrics[metric].get('desc', metric)
-            self.exporter_metrics[metric] = Gauge(name, desc)
+            self.exporter_metrics[name] = Gauge(name, desc)
         return self.exporter_metrics
 
     def _save_metrics_dump(self, data, dumpfile):
@@ -158,8 +158,9 @@ class PaymentExporter:
                 info_dict = info.get(info_type, None)
                 if info_dict:
                     value = info_dict.get(info_key, 0)
-                    self.exporter_metrics[title].set(value)
-                    dump[title] = value
+                    name = prefix + '_' + title
+                    self.exporter_metrics[name].set(value)
+                    dump[name] = value
         self._save_metrics_dump(dump, self.conf['dump'])
         return True
 
@@ -171,9 +172,10 @@ class PaymentExporter:
                 if not self.fill_metrics(self.conf['metrics']):
                     raise Exception('Failed to init metrics')
                 first_start = True
-            # Start up the server to expose the metrics.
-            start_http_server(self.conf['port'])
-            self.log.info('Payment exporter started')
+            if self.running:
+                # Start up the server to expose the metrics.
+                start_http_server(self.conf['port'])
+                self.log.info('Payment exporter started')
             # Wait first iterval outside the loop
             if first_start:
                 self.end_event.wait(timeout=self.conf['sleep'])
