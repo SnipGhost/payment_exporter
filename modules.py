@@ -123,7 +123,7 @@ class MarynoNetExtractor(Extractor):
             bonus['last_pay_dt'] = dp.parse(last_pay_seconds).timestamp()
         else:
             bonus = {}
-        self.log.info('All data retrieved and corrected')
+        self.log.info('MarynoNetExtractor: All data retrieved and corrected')
         return {'data': data, 'bonus': bonus}
 
     def run(self):
@@ -137,17 +137,22 @@ class MarynoNetExtractor(Extractor):
 
 
 class SpeedTestExtractor(Extractor):
-    def __init__(self, logger, attempts, **kwargs):
+    def __init__(self, logger, attempts, end_event, **kwargs):
         super(SpeedTestExtractor, self).__init__(logger, **kwargs)
         self.st = speedtest.Speedtest()
         self.attempts = attempts
+        self.end_event = end_event
 
     def run(self):
         latency = []
         upload = []
         download = []
-        for attempt in range(self.attempts):
-            self.log.info('Iteration {} of {}'.format(attempt, self.attempts))
+        limit = self.attempts
+        for attempt in range(limit):
+            if self.end_event.is_set():
+                self.log.info('End event detected, emergency termination')
+                break
+            self.log.info('Iteration {} of {}'.format(attempt + 1, limit))
             server = self.st.get_best_server()
             latency.append(server.get('latency', 0))
             download.append(self.st.download())
@@ -155,9 +160,9 @@ class SpeedTestExtractor(Extractor):
             self.log.debug('Test via {}'.format(server.get('host', None)))
 
         result = {
-            'avg_latency': sum(latency) / self.attempts,
-            'avg_upload': sum(upload) / self.attempts,
-            'avg_download': sum(download) / self.attempts,
+            'avg_latency': sum(latency) / limit,
+            'avg_upload': sum(upload) / limit,
+            'avg_download': sum(download) / limit,
             'min_latency': min(latency),
             'min_upload': min(upload),
             'min_download': min(download),
@@ -165,4 +170,5 @@ class SpeedTestExtractor(Extractor):
             'max_upload': max(upload),
             'max_download': max(download),
         }
+        self.log.info('SpeedTestExtractor: All data retrieved and corrected')
         return {'data': result}

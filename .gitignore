@@ -1,3 +1,4 @@
 __pycache__/
 *.pyc
 env/
+payment_exporter.dump.json

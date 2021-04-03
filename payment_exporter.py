@@ -21,20 +21,25 @@ class PaymentExporter:
         if self.conf['log_level'] == 'DEBUG':
             self.log.debug('Config: {}'.format(hide_config(self.conf)))
 
+        # Termination handle
+        self.running = True
+        self.end_event = threading.Event()
+        self.__setup_signal_handlers()
+
         # Construct used extractors
         self.extractors = {}
         for prefix, extractor in self.conf['extractors'].items():
             class_name = extractor.get('module', 'Extractor')
             extractor_class = getattr(modules, class_name)
-            self.extractors[prefix] = extractor_class(self.log, **extractor)
+            self.extractors[prefix] = extractor_class(
+                self.log,
+                **extractor,
+                end_event=self.end_event,
+            )
         # Create used metrics
         self.exporter_metrics = {}
         for prefix, definition in self.conf['metrics'].items():
             self.append_metrics(prefix, definition)
-
-        self.running = True
-        self.end_event = threading.Event()
-        self.__setup_signal_handlers()
 
     def _load_config(self, args):
         # Default log format (not joined yet)
@@ -44,11 +49,13 @@ class PaymentExporter:
             "%(message)s",
         ]
         # Default config
+        default_dump = 'payment_exporter.dump.json'
         config = {
             'log_level': 'INFO',     # logging level
             'log_format': None,      # logging format (None for default)
             'sleep': 43200,          # time to sleep in seconds before collect
             'port': 9999,            # port binding to expose metrics
+            'dump': default_dump,    # metrics dump filename
             'extractors': {          # definition of prefixes and extractors
                 'maryno_net': {
                     'module': 'MarynoNetExtractor',
@@ -111,7 +118,34 @@ class PaymentExporter:
             self.exporter_metrics[metric] = Gauge(name, desc)
         return self.exporter_metrics
 
+    def _save_metrics_dump(self, data, dumpfile):
+        try:
+            with open(dumpfile, 'w') as json_file:
+                json.dump(data, json_file)
+        except Exception as err:
+            self.log.error('Failed to save dump: {}'.format(err))
+            return
+        self.log.info('Saved metrics to file: {}'.format(dumpfile))
+
+    def _load_metrics_dump(self, dumpfile):
+        try:
+            with open(dumpfile) as json_file:
+                dump = json.load(json_file)
+            for key, value in dump.items():
+                metric = self.exporter_metrics.get(key, None)
+                if metric:
+                    metric.set(value)
+                else:
+                    self.log.warning('Skip not defined metric {}'.format(key))
+        except Exception as err:
+            self.log.warning('Failed to load dump: {}'.format(err))
+            return None
+        self.log.info('Loaded metrics dump from file: {}'.format(dumpfile))
+        self.log.debug('Metrics dump: {}'.format(dump))
+        return True
+
     def fill_metrics(self, all_metrics):
+        dump = {}
         for prefix, metrics in all_metrics.items():
             extractor = self.extractors[prefix]
             info = extractor.run()
@@ -125,18 +159,25 @@ class PaymentExporter:
                 if info_dict:
                     value = info_dict.get(info_key, 0)
                     self.exporter_metrics[title].set(value)
+                    dump[title] = value
+        self._save_metrics_dump(dump, self.conf['dump'])
         return True
 
     def run(self):
         try:
-            if not self.fill_metrics(self.conf['metrics']):
-                raise Exception('Failed to init metrics')
-            self.sleeped = False
+            first_start = False
+            # Load metrics from last startup
+            if not self._load_metrics_dump(self.conf['dump']):
+                if not self.fill_metrics(self.conf['metrics']):
+                    raise Exception('Failed to init metrics')
+                first_start = True
             # Start up the server to expose the metrics.
             start_http_server(self.conf['port'])
             self.log.info('Payment exporter started')
-            # Wait first interval before run fill_metrics
-            self.end_event.wait(timeout=self.conf['sleep'])
+            # Wait first iterval outside the loop
+            if first_start:
+                self.end_event.wait(timeout=self.conf['sleep'])
+            # Normal working loop
             while self.running:
                 self.fill_metrics(self.conf['metrics'])
                 # Sleep until timeout or end_event set
@@ -154,6 +195,8 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Payment exporter')
     parser.add_argument('-c', '--config', type=str, default='payment_exporter.config.json',
                         help='Path to config JSON file')
+    parser.add_argument('-d', '--dump', type=str, default=None,
+                        help='Path to metrics dump JSON file')
     parser.add_argument('-s', '--sleep', type=str, default=None,
                         help='Sleep time in seconds, a low value may cause rate-limit')
     parser.add_argument('-P', '--port', type=int, default=None,
