@@ -1,23 +1,37 @@
 import requests
 import speedtest
+import logging
 import dateutil.parser as dp
 
 
 class Extractor:
     ''' Default extractor, do nothing '''
 
-    def __init__(self, logger, **kwargs):
-        self.log = logger
+    def __init__(self, **kwargs):
+        self.log = kwargs.get('logger', None)
+        if not self.log:
+            self.log = logging.getLogger()
+        self.interval = kwargs.get('interval', 0)
+        # First run immediately
+        self.skipped = self.interval
 
     def run(self):
+        if self.interval and self.skipped < self.interval:
+            self.skipped += 1
+            return 'skip'
+        self.skipped = 0
+        return self.real_run()
+
+    def real_run(self):
+        # Placeholder
         return {'data': {}}
 
 
 class MarynoNetExtractor(Extractor):
     ''' Extract metrics data from maryno.net account pages '''
 
-    def __init__(self, logger, username, password, **kwargs):
-        super(MarynoNetExtractor, self).__init__(logger, **kwargs)
+    def __init__(self, username, password, **kwargs):
+        super(MarynoNetExtractor, self).__init__(**kwargs)
         self.session = requests.Session()
         base_url = kwargs.get('base_url', 'https://lk.maryno.net')
         auth_retry = kwargs.get('auth_retry', 2)
@@ -126,7 +140,7 @@ class MarynoNetExtractor(Extractor):
         self.log.info('MarynoNetExtractor: All data retrieved and corrected')
         return {'data': data, 'bonus': bonus}
 
-    def run(self):
+    def real_run(self):
         attempt = 0
         while not self._auth():
             attempt += 1
@@ -137,13 +151,14 @@ class MarynoNetExtractor(Extractor):
 
 
 class SpeedTestExtractor(Extractor):
-    def __init__(self, logger, attempts, end_event, **kwargs):
-        super(SpeedTestExtractor, self).__init__(logger, **kwargs)
+    def __init__(self, end_event, **kwargs):
+        super(SpeedTestExtractor, self).__init__(**kwargs)
         self.st = speedtest.Speedtest()
-        self.attempts = attempts
+        self.attempts = kwargs.get('attempts', 3)
         self.end_event = end_event
+        self.st.get_servers(kwargs.get('servers', []))
 
-    def run(self):
+    def real_run(self):
         latency = []
         upload = []
         download = []

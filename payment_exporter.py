@@ -32,8 +32,8 @@ class PaymentExporter:
             class_name = extractor.get('module', 'Extractor')
             extractor_class = getattr(modules, class_name)
             self.extractors[prefix] = extractor_class(
-                self.log,
                 **extractor,
+                logger=self.log,
                 end_event=self.end_event,
             )
         # Create used metrics
@@ -152,6 +152,9 @@ class PaymentExporter:
             if not info:
                 self.log.warning('Wrong data from {}'.format(extractor))
                 return False
+            if info == 'skip':
+                self.log.info('Skipped {}, cause is interval'.format(prefix))
+                continue
             for title, metric in metrics.items():
                 info_type = metric.get('type', 'data')
                 info_key = metric.get('key', title)
