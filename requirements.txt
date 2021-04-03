@@ -1,3 +1,4 @@
 python-dateutil
 prometheus-client
 requests
+speedtest-cli

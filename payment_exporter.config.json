@@ -9,6 +9,10 @@
 			"password": "",
 			"auth_retry": 2,
 			"base_url": "https://lk.maryno.net"
+		},
+		"speed_test": {
+			"module": "SpeedTestExtractor",
+			"attempts": 3
 		}
 	},
 	"metrics": {
@@ -61,6 +65,35 @@
 			"days_since_block": {
 				"desc": "Maryno.net provider days since last blocking",
 				"type": "bonus"
+			}
+		},
+		"speed_test": {
+			"avg_latency": {
+				"desc": "Average latency in ms"
+			},
+			"avg_download": {
+				"desc": "Average download speed in bits/sec"
+			},
+			"avg_upload": {
+				"desc": "Average upload speed in bits/sec"
+			},
+			"min_latency": {
+				"desc": "Minimum latency in ms"
+			},
+			"min_download": {
+				"desc": "Minimum download speed in bits/sec"
+			},
+			"min_upload": {
+				"desc": "Minimum upload speed in bits/sec"
+			},
+			"max_latency": {
+				"desc": "Maximum latency in ms"
+			},
+			"max_download": {
+				"desc": "Maximum download speed in bits/sec"
+			},
+			"max_upload": {
+				"desc": "Maximum upload speed in bits/sec"
 			}
 		}
 	}

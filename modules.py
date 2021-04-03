@@ -1,4 +1,5 @@
 import requests
+import speedtest
 import dateutil.parser as dp
 
 
@@ -133,3 +134,35 @@ class MarynoNetExtractor(Extractor):
                 self.log.error('Failed to auth, auth retry limit')
                 return None
         return self._extract()
+
+
+class SpeedTestExtractor(Extractor):
+    def __init__(self, logger, attempts, **kwargs):
+        super(SpeedTestExtractor, self).__init__(logger, **kwargs)
+        self.st = speedtest.Speedtest()
+        self.attempts = attempts
+
+    def run(self):
+        latency = []
+        upload = []
+        download = []
+        for attempt in range(self.attempts):
+            self.log.info('Iteration {} of {}'.format(attempt, self.attempts))
+            server = self.st.get_best_server()
+            latency.append(server.get('latency', 0))
+            download.append(self.st.download())
+            upload.append(self.st.upload())
+            self.log.debug('Test via {}'.format(server.get('host', None)))
+
+        result = {
+            'avg_latency': sum(latency) / self.attempts,
+            'avg_upload': sum(upload) / self.attempts,
+            'avg_download': sum(download) / self.attempts,
+            'min_latency': min(latency),
+            'min_upload': min(upload),
+            'min_download': min(download),
+            'max_latency': max(latency),
+            'max_upload': max(upload),
+            'max_download': max(download),
+        }
+        return {'data': result}
