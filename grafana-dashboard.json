@@ -16,10 +16,11 @@
 	"gnetId": null,
 	"graphTooltip": 0,
 	"id": 13,
+	"iteration": 1617461180814,
 	"links": [],
 	"panels": [
 		{
-			"datasource": null,
+			"datasource": "$DS_PROMETHEUS",
 			"fieldConfig": {
 				"defaults": {
 					"custom": {},
@@ -69,7 +70,7 @@
 			"pluginVersion": "7.3.6",
 			"targets": [
 				{
-					"expr": "maryno_net_days_since_block",
+					"expr": "maryno_net_days_since_block{instance=~\"$instance\"}",
 					"interval": "",
 					"legendFormat": "",
 					"refId": "A"
@@ -81,7 +82,7 @@
 			"type": "stat"
 		},
 		{
-			"datasource": null,
+			"datasource": "$DS_PROMETHEUS",
 			"fieldConfig": {
 				"defaults": {
 					"custom": {},
@@ -89,7 +90,7 @@
 						{
 							"from": "",
 							"id": 1,
-							"text": "Активен",
+							"text": "Active",
 							"to": "",
 							"type": 1,
 							"value": "0"
@@ -97,7 +98,7 @@
 						{
 							"from": "",
 							"id": 2,
-							"text": "Заблокирован",
+							"text": "Locked",
 							"to": "",
 							"type": 1,
 							"value": "1"
@@ -144,7 +145,7 @@
 			"pluginVersion": "7.3.6",
 			"targets": [
 				{
-					"expr": "maryno_net_is_blocked",
+					"expr": "maryno_net_is_blocked{instance=~\"$instance\"}",
 					"interval": "",
 					"legendFormat": "",
 					"refId": "A"
@@ -156,14 +157,17 @@
 			"type": "stat"
 		},
 		{
-			"datasource": null,
+			"datasource": "$DS_PROMETHEUS",
 			"fieldConfig": {
 				"defaults": {
 					"color": {
 						"fixedColor": "purple",
 						"mode": "fixed"
 					},
-					"custom": {},
+					"custom": {
+						"align": null,
+						"filterable": false
+					},
 					"mappings": [],
 					"thresholds": {
 						"mode": "absolute",
@@ -192,7 +196,7 @@
 			"options": {
 				"colorMode": "value",
 				"graphMode": "none",
-				"justifyMode": "auto",
+				"justifyMode": "center",
 				"orientation": "auto",
 				"reduceOptions": {
 					"calcs": [
@@ -206,7 +210,7 @@
 			"pluginVersion": "7.3.6",
 			"targets": [
 				{
-					"expr": "maryno_net_last_pay_seconds * 1000",
+					"expr": "maryno_net_last_pay_seconds{instance=~\"$instance\"} * 1000",
 					"instant": false,
 					"interval": "",
 					"legendFormat": "",
@@ -219,7 +223,7 @@
 			"type": "stat"
 		},
 		{
-			"datasource": null,
+			"datasource": "$DS_PROMETHEUS",
 			"fieldConfig": {
 				"defaults": {
 					"color": {
@@ -265,7 +269,7 @@
 			"pluginVersion": "7.3.6",
 			"targets": [
 				{
-					"expr": "maryno_net_last_pay_sum",
+					"expr": "maryno_net_last_pay_sum{instance=~\"$instance\"}",
 					"interval": "",
 					"legendFormat": "",
 					"refId": "A"
@@ -277,7 +281,7 @@
 			"type": "stat"
 		},
 		{
-			"datasource": null,
+			"datasource": "$DS_PROMETHEUS",
 			"fieldConfig": {
 				"defaults": {
 					"color": {
@@ -323,7 +327,7 @@
 			"pluginVersion": "7.3.6",
 			"targets": [
 				{
-					"expr": "maryno_net_sum_pays",
+					"expr": "maryno_net_sum_pays{instance=~\"$instance\"}",
 					"interval": "",
 					"legendFormat": "",
 					"refId": "A"
@@ -339,7 +343,7 @@
 			"bars": false,
 			"dashLength": 10,
 			"dashes": false,
-			"datasource": null,
+			"datasource": "$DS_PROMETHEUS",
 			"fieldConfig": {
 				"defaults": {
 					"custom": {},
@@ -383,13 +387,13 @@
 			"steppedLine": false,
 			"targets": [
 				{
-					"expr": "maryno_net_balance",
+					"expr": "maryno_net_balance{instance=~\"$instance\"}",
 					"interval": "",
 					"legendFormat": "Баланс счета",
 					"refId": "A"
 				},
 				{
-					"expr": "maryno_net_plan_cost",
+					"expr": "maryno_net_plan_cost{instance=~\"$instance\"}",
 					"interval": "",
 					"legendFormat": "Стоимость в месяц",
 					"refId": "B"
@@ -441,10 +445,11 @@
 			"bars": false,
 			"dashLength": 10,
 			"dashes": false,
-			"datasource": null,
+			"datasource": "$DS_PROMETHEUS",
 			"fieldConfig": {
 				"defaults": {
-					"custom": {}
+					"custom": {},
+					"unit": "bps"
 				},
 				"overrides": []
 			},
@@ -452,7 +457,7 @@
 			"fillGradient": 0,
 			"gridPos": {
 				"h": 6,
-				"w": 12,
+				"w": 15,
 				"x": 0,
 				"y": 11
 			},
@@ -484,23 +489,47 @@
 			"steppedLine": false,
 			"targets": [
 				{
-					"expr": "maryno_net_bonus_count",
+					"expr": "speed_test_avg_upload{instance=~\"$instance\"}",
 					"interval": "",
-					"legendFormat": "Общее количество бонусов",
+					"legendFormat": "avg_upload",
 					"refId": "A"
 				},
 				{
-					"expr": "maryno_net_bonus_available",
+					"expr": "speed_test_max_upload{instance=~\"$instance\"}",
 					"interval": "",
-					"legendFormat": "Доступные бонусы",
+					"legendFormat": "max_upload",
 					"refId": "B"
+				},
+				{
+					"expr": "speed_test_min_upload{instance=~\"$instance\"}",
+					"interval": "",
+					"legendFormat": "min_upload",
+					"refId": "C"
+				},
+				{
+					"expr": "speed_test_avg_download{instance=~\"$instance\"}",
+					"interval": "",
+					"legendFormat": "avg_download",
+					"refId": "D"
+				},
+				{
+					"expr": "speed_test_max_download{instance=~\"$instance\"}",
+					"interval": "",
+					"legendFormat": "max_download",
+					"refId": "E"
+				},
+				{
+					"expr": "speed_test_min_download{instance=~\"$instance\"}",
+					"interval": "",
+					"legendFormat": "min_download",
+					"refId": "F"
 				}
 			],
 			"thresholds": [],
 			"timeFrom": null,
 			"timeRegions": [],
 			"timeShift": null,
-			"title": "G-Bonus",
+			"title": "Скорость сети",
 			"tooltip": {
 				"shared": true,
 				"sort": 0,
@@ -516,12 +545,12 @@
 			},
 			"yaxes": [
 				{
-					"decimals": 0,
-					"format": "short",
+					"decimals": null,
+					"format": "bps",
 					"label": null,
 					"logBase": 1,
 					"max": null,
-					"min": "0",
+					"min": null,
 					"show": true
 				},
 				{
@@ -543,7 +572,7 @@
 			"bars": false,
 			"dashLength": 10,
 			"dashes": false,
-			"datasource": null,
+			"datasource": "$DS_PROMETHEUS",
 			"description": "",
 			"fieldConfig": {
 				"defaults": {
@@ -570,8 +599,8 @@
 			"fillGradient": 0,
 			"gridPos": {
 				"h": 6,
-				"w": 12,
-				"x": 12,
+				"w": 9,
+				"x": 15,
 				"y": 11
 			},
 			"hiddenSeries": false,
@@ -602,13 +631,13 @@
 			"steppedLine": false,
 			"targets": [
 				{
-					"expr": "maryno_net_sum_pays",
+					"expr": "maryno_net_sum_pays{instance=~\"$instance\"}",
 					"interval": "",
 					"legendFormat": "Всего оплачено",
 					"refId": "A"
 				},
 				{
-					"expr": "maryno_net_sum_pays_remaining",
+					"expr": "maryno_net_sum_pays_remaining{instance=~\"$instance\"}",
 					"interval": "",
 					"legendFormat": "Осталось до уровня",
 					"refId": "B"
@@ -660,7 +689,49 @@
 	"style": "dark",
 	"tags": [],
 	"templating": {
-		"list": []
+		"list": [
+			{
+				"current": {
+					"selected": false,
+					"text": "default",
+					"value": "default"
+				},
+				"error": null,
+				"hide": 2,
+				"includeAll": false,
+				"label": "datasource",
+				"multi": false,
+				"name": "DS_PROMETHEUS",
+				"options": [],
+				"query": "prometheus",
+				"queryValue": "",
+				"refresh": 1,
+				"regex": "default",
+				"skipUrlSync": false,
+				"type": "datasource"
+			},
+			{
+				"current": {
+					"selected": false,
+					"text": "miku.+",
+					"value": "miku.+"
+				},
+				"error": null,
+				"hide": 2,
+				"label": null,
+				"name": "instance",
+				"options": [
+					{
+						"selected": true,
+						"text": "miku.+",
+						"value": "miku.+"
+					}
+				],
+				"query": "miku.+",
+				"skipUrlSync": false,
+				"type": "constant"
+			}
+		]
 	},
 	"time": {
 		"from": "now-30m",
@@ -670,5 +741,5 @@
 	"timezone": "",
 	"title": "Payments",
 	"uid": "Ii7ZkWmRz",
-	"version": 5
+	"version": 10
 }
